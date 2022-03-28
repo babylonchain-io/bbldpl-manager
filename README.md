@@ -6,7 +6,7 @@ multiple Babylon nodes deployed as Docker containers on a single machine.
 ## Installation
 
 First, you need to create a Docker image corresponding to a Babylon node. To do
-that, follow the instructions on the [Babylon Docker]()
+that, follow the instructions on the [Babylon Docker](https://github.com/babylonchain-io/bbld-docker)
 deployment repository.
 
 After that,
