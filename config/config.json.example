@@ -1,0 +1,35 @@
+{
+    "nodes": {
+        "nodeName1": {
+            "user": "bbl1",
+            "pass": "bbl2",
+            "port": "18555",
+            "rpcuser": "rpcbbl1",
+            "rpcpass": "rpcbbl1",
+            "rpcport": "18556",
+            "walletpass": "supersecret",
+            "accounts": ["account1", "account2"],
+            "miningaccount": "account1",
+            "hostport": "18888"
+        },
+        "nodeName2": {
+            "user": "bbl1",
+            "pass": "bbl2",
+            "port": "18555",
+            "rpcuser": "rpcbbl2",
+            "rpcpass": "rpcbbl2",
+            "rpcport": "18556",
+            "walletpass": "supersecret2",
+            "accounts": ["account1", "account2"],
+            "miningaccount": "account2",
+            "hostport": "18889"
+        }
+    },
+    "connections": [
+        ["nodeName1", "nodeName2"]
+    ],
+    "network": {
+        "name": "babylon-network"
+    },
+    "simnet": "true"
+}

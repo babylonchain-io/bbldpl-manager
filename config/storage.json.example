@@ -1,0 +1,49 @@
+{
+  "network": "networkID",
+  "nodeName1": {
+    "containerID": "containerID",
+    "accounts": {
+      "account1": {
+        "addresses": [
+          "accountaddress"
+        ]
+      },
+      "account2": {
+        "addresses": [
+          "accountaddress"
+        ]
+      },
+      "default": {
+        "addresses": [
+          "accountaddress"
+        ]
+      }
+    },
+    "wallet": {
+      "seed": ""
+    }
+  },
+  "nodeName2": {
+    "containerID": "containerID",
+    "accounts": {
+      "account1": {
+        "addresses": [
+          "accountaddress"
+        ]
+      },
+      "account2": {
+        "addresses": [
+          "accountaddress"
+        ]
+      },
+      "default": {
+        "addresses": [
+          "accountaddress"
+        ]
+      }
+    },
+    "wallet": {
+      "seed": ""
+    }
+  }
+}
