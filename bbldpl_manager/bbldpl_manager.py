@@ -18,6 +18,8 @@ class BbldplManager:
         self.node_config = self._read_config(self.config_file)
         self.storage_config = self._read_json(self.storage_file)
 
+        self.simnet = self.node_config["simnet"]
+
         self.container_manager = ContainerManager(self.storage_config)
 
     def deploy(self):
@@ -44,37 +46,42 @@ class BbldplManager:
 
             ip_mapping = self._get_ip_mapping(node_info)
             print("{}: Creating container...".format(node_name))
-            self.container_manager.create_container(self.image_name, node_name, self.node_config["network"]["name"], ip_mapping)
+            self.container_manager.create_container(self.image_name,
+                    node_name, self.node_config["network"]["name"], ip_mapping)
 
             print("{}: Generating wallet...".format(node_name))
-            self.container_manager.generate_wallet(node_name, node_info["user"], node_info["pass"], node_info["walletpass"])
+            self.container_manager.generate_wallet(node_name,
+                    node_info["user"], node_info["pass"], node_info["walletpass"],
+                    simnet=self.simnet)
 
             print("{}: Starting bbld daemon...".format(node_name))
             self.container_manager.start_bbld_daemon(node_name, node_info["user"],
-                    node_info["pass"], simnet=self.node_config["simnet"])
+                    node_info["pass"], node_info["rpcport"],
+                    node_info["port"], simnet=self.simnet)
 
             print("{}: Wait for bbld daemon to come up...".format(node_name))
             time.sleep(self.PROC_MIN_WAIT)
 
             print("{}: Starting btcwallet daemon...".format(node_name))
             self.container_manager.start_btcwallet_daemon(node_name, node_info["user"],
-                    node_info["pass"], simnet=self.node_config["simnet"])
+                    node_info["pass"], simnet=self.simnet)
             print("{}: Wait for btcwallet daemon to come up...".format(node_name))
             time.sleep(self.PROC_MIN_WAIT)
 
             print("{}: Unlocking wallet...".format(node_name))
             self.container_manager.unlock_wallet(node_name,
                     node_info["user"], node_info["pass"],
-                    node_info["walletpass"], self.WALLET_TIMEOUT, simnet=self.node_config["simnet"])
+                    node_info["walletpass"], self.WALLET_TIMEOUT, simnet=self.simnet)
             print("{}: Creating accounts...".format(node_name))
             # "default" is an already existing account name, so generate an address for it as well
             for account in node_info["accounts"] + ["default"]:
                 if not self.container_manager.account_exists(node_name, node_info["user"],
-                        node_info["pass"], account, simnet=self.node_config["simnet"]):
-                    self.container_manager.add_account(node_name, node_info["user"], node_info["pass"], account, simnet=self.node_config["simnet"])
+                            node_info["pass"], account, simnet=self.node_config["simnet"]):
+                    self.container_manager.add_account(node_name, node_info["user"],
+                            node_info["pass"], account, simnet=self.simnet)
 
                 address = self.container_manager.generate_address(node_name, node_info["user"],
-                        node_info["pass"], account, simnet=self.node_config["simnet"])
+                        node_info["pass"], account, simnet=self.simnet)
                 print("\t\t{} assigned address {}".format(account, address))
 
 
@@ -85,11 +92,12 @@ class BbldplManager:
             self.container_manager.kill_bbld_daemon(node_name)
             self.container_manager.start_bbld_daemon(node_name,
                     node_info["user"], node_info["pass"],
+                    node_info["rpcport"], node_info["port"],
                     mining_address=self.container_manager.get_first_address(node_name,
                             node_info["user"], node_info["pass"],
-                            node_info["miningaccount"], simnet=self.node_config["simnet"]),
+                            node_info["miningaccount"], simnet=self.simnet),
                     connections=connections_per_node[node_name],
-                    simnet=self.node_config["simnet"])
+                    simnet=self.simnet)
         print("Wait for bbld nodes to restart".format(node_name))
         time.sleep(self.PROC_MIN_WAIT * 2)
 
@@ -98,7 +106,7 @@ class BbldplManager:
             print("{}: Starting Mining...".format(node_name))
             self.container_manager.start_mining(node_name,
                     node_info["user"], node_info["pass"],
-                    simnet=self.node_config["simnet"])
+                    simnet=self.simnet)
 
         print("Done!")
 
