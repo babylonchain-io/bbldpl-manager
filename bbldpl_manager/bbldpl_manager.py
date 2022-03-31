@@ -7,7 +7,6 @@ from bbldpl_manager.container import ContainerManager
 from collections import defaultdict
 
 class BbldplManager:
-    # TODO: maybe include this in the configuration?
     WALLET_TIMEOUT = 1800
     PROC_MIN_WAIT = 60
 
@@ -113,11 +112,14 @@ class BbldplManager:
                 print("Node {} is not running.".format(node_name))
                 continue
 
+            print("{}: Destroying...".format(node_name))
             self.container_manager.destroy_container(node_name)
 
+        print("Destroying network...")
         self.container_manager.destroy_network()
 
         self.flush_storage()
+        print("Done")
 
     def flush_storage(self):
         """
