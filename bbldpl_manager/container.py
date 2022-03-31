@@ -33,14 +33,14 @@ class ContainerManager:
         container.remove()
         del self.storage_config[node_name]
 
-    def start_bbld_daemon(self, node_name, rpcuser, rpcpass, rpcport, port,
+    def start_bbld_daemon(self, node_name, user, passw, rpcport, port,
             mining_address=None, connections=[], simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
         # Construct bbld command
-        bbld_cmd = ["bbld", "--rpcuser=" + rpcuser, "--rpcpass=" + rpcpass,
+        bbld_cmd = ["bbld", "-u", user, "-P" + passw,
                 "--rpclisten=0.0.0.0:" + rpcport, "--listen=0.0.0.0:" + port]
         if simnet:
             bbld_cmd += ["--simnet"]
@@ -115,38 +115,38 @@ class ContainerManager:
         # Store seed in storage file
         self.storage_config[node_name]["wallet"]["seed"] = "" # TODO
 
-    def unlock_wallet(self, node_name, rpcuser, rpcpass, walletpass,
+    def unlock_wallet(self, node_name, user, passw, walletpass,
             timeout, simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
         unlock_wallet_cmd = ["btcctl",
-                "--rpcuser=" + rpcuser, "--rpcpass=" + rpcpass,
+                "-u", user, "-P", passw,
                 "--wallet", "walletpassphrase", walletpass, str(timeout)]
         if simnet:
             unlock_wallet_cmd += ["--simnet"]
 
         self._execute_cmd(container, unlock_wallet_cmd)
 
-    def account_exists(self, node_name, rpcuser, rpcpass, account, simnet=False):
+    def account_exists(self, node_name, user, passw, account, simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
-        accounts = self._get_accounts(container, node_name, rpcuser, rpcpass, simnet)
+        accounts = self._get_accounts(container, node_name, user, passw, simnet)
 
         return account in accounts
 
-    def add_account(self, node_name, rpcuser, rpcpass, account, simnet=False):
+    def add_account(self, node_name, user, passw, account, simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
-        if self.account_exists(node_name, rpcuser, rpcpass, account, simnet):
+        if self.account_exists(node_name, user, passw, account, simnet):
             return
 
-        add_account_cmd = ["btcctl", "--rpcuser=" + rpcuser, "--rpcpass=" + rpcpass,
+        add_account_cmd = ["btcctl", "-u", user, "-P", passw,
                 "--wallet", "createnewaccount", account]
         if simnet:
             add_account_cmd += ["--simnet"]
@@ -154,12 +154,12 @@ class ContainerManager:
         self._execute_cmd(container, add_account_cmd)
         self.storage_config[node_name]["accounts"][account] = {"addresses": []}
 
-    def generate_address(self, node_name, rpcuser, rpcpass, account, simnet=False):
+    def generate_address(self, node_name, user, passw, account, simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
-        if not self.account_exists(node_name, rpcuser, rpcpass, account, simnet):
+        if not self.account_exists(node_name, user, passw, account, simnet):
             raise ContainerAccountDoesNotExistError(
                     "Account {} does not exist".format(account))
 
@@ -168,8 +168,8 @@ class ContainerManager:
                 "addresses": []
             }
 
-        generate_addr_cmd = ["btcctl", "--rpcuser=" + rpcuser,
-                "--rpcpass=" + rpcpass, "--wallet", "getnewaddress", account]
+        generate_addr_cmd = ["btcctl", "-u", user,
+                "-P", passw, "--wallet", "getnewaddress", account]
         if simnet:
             generate_addr_cmd += ["--simnet"]
         address = self._execute_cmd(container,
@@ -177,16 +177,16 @@ class ContainerManager:
         self.storage_config[node_name]["accounts"][account]["addresses"].append(address)
         return address
 
-    def get_addresses(self, node_name, rpcuser, rpcpass, account, simnet=False):
+    def get_addresses(self, node_name, user, passw, account, simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
-        if not self.account_exists(node_name, rpcuser, rpcpass, account, simnet):
+        if not self.account_exists(node_name, user, passw, account, simnet):
             raise ContainerAccountDoesNotExistError(
                     "Account {} does not exist".format(account))
 
-        get_address_cmd = ["btcctl", "--rpcuser=" + rpcuser, "--rpcpass=" + rpcpass,
+        get_address_cmd = ["btcctl", "-u", user, "-P", passw,
                 "--wallet", "getaddressesbyaccount", account]
         if simnet:
             get_address_cmd += ["--simnet"]
@@ -194,8 +194,8 @@ class ContainerManager:
         addresses = json.loads(self._execute_cmd(container, get_address_cmd))
         return addresses
 
-    def get_first_address(self, node_name, rpcuser, rpcpass, account, simnet=False):
-        addresses = self.get_addresses(node_name, rpcuser, rpcpass, account, simnet)
+    def get_first_address(self, node_name, user, passw, account, simnet=False):
+        addresses = self.get_addresses(node_name, user, passw, account, simnet)
         if len(addresses):
             return addresses[0]
 
@@ -213,25 +213,25 @@ class ContainerManager:
 
         del self.storage_config["network"]
 
-    def start_mining(self, node_name, rpcuser, rpcpass, simnet=False):
+    def start_mining(self, node_name, user, passw, simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
-        start_mining_cmd = ["btcctl", "--rpcuser=" + rpcuser,
-                "--rpcpass=" + rpcpass, "--wallet", "setgenerate", "1"]
+        start_mining_cmd = ["btcctl", "-u", user,
+                "-P", passw, "--wallet", "setgenerate", "1"]
         if simnet:
             start_mining_cmd += ["--simnet"]
 
         self._execute_cmd(container, start_mining_cmd)
 
-    def stop_mining(self, node_name, rpcuser, rpcpass, simnet=False):
+    def stop_mining(self, node_name, user, passw, simnet=False):
         container = self._get_container(node_name)
         if not container:
             raise ContainerNameDoesNotExistError()
 
-        stop_mining_cmd = ["btcctl", "--rpcuser=" + rpcuser,
-                "--rpcpass=" + rpcpass, "--wallet", "setgenerate", "0"]
+        stop_mining_cmd = ["btcctl", "-u", user,
+                "-P", passw, "--wallet", "setgenerate", "0"]
         if simnet:
             stop_mining_cmd += ["--simnet"]
 
@@ -281,8 +281,8 @@ class ContainerManager:
                 continue
             break
 
-    def _get_accounts(self, container, node_name, rpcuser, rpcpass, simnet):
-        list_accounts_cmd = ["btcctl", "--rpcuser=" + rpcuser, "--rpcpass=" + rpcpass,
+    def _get_accounts(self, container, node_name, user, passw, simnet):
+        list_accounts_cmd = ["btcctl", "-u", user, "-P", passw,
                 "--wallet", "listaccounts"]
         if simnet:
             list_accounts_cmd += ["--simnet"]
