@@ -18,7 +18,6 @@ def setup_package():
         long_description_content_type="text/markdown",
         url='https://github.com/babylonchain-io/bbldlp-manager',
         packages=find_packages(),
-        install_requires=[],
         entry_points = {
             'console_scripts': [
                 'bbldlp-manager=bbldlp_manager.__main__:main',
