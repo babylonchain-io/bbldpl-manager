@@ -11,16 +11,16 @@ def get_long_desc():
 
 def setup_package():
     setup(
-        name='bbldlp-manager',
+        name='bbldpl-manager',
         version='0.0.1',
         description='Babylon Deployment Manager',
         long_description=get_long_desc(),
         long_description_content_type="text/markdown",
-        url='https://github.com/babylonchain-io/bbldlp-manager',
+        url='https://github.com/babylonchain-io/bbldpl-manager',
         packages=find_packages(),
         entry_points = {
             'console_scripts': [
-                'bbldlp-manager=bbldlp_manager.__main__:main',
+                'bbldpl-manager=bbldpl_manager.__main__:main',
             ],
         },
         classifiers=[
