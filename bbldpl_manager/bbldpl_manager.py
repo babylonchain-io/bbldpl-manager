@@ -158,9 +158,11 @@ class BbldplManager:
         names, we do not need to assign IP addresses, but only use the node names.
         """
         connections_per_node = defaultdict(list)
-        for node1, node2 in self.node_config["connections"]:
+        for node1, node2 in self.node_config["connections"]["internal"]:
             connections_per_node[node1].append(node2 + ":" + self.node_config["nodes"][node2]["port"])
             connections_per_node[node2].append(node1 + ":" + self.node_config["nodes"][node1]["port"])
+        for node1, node2 in self.node_config["connections"]["external"]:
+            connections_per_node[node1].append(node2)
         return connections_per_node
 
     def _read_config(self, config_file):

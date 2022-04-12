@@ -46,9 +46,14 @@ configuration file looks like this (a sample can be found on
             "hostport": "18889"
         }
     },
-    "connections": [
-        ["nodeName1", "nodeName2"]
-    ],
+    "connections": {
+        "internal": [
+            ["nodeName1", "nodeName2"]
+        ],
+        "external": [
+            ["nodeName1", "192.168.1.1:8888"]
+        ]
+    },
     "network": {
         "name": "babylon-network"
     },
